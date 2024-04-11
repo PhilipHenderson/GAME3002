@@ -1,10 +1,11 @@
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerScript: MonoBehaviour
 {
     public float moveSpeed = 5f;
     public float jumpForce = 10f;
     public float airControlFactor = 0.5f; // Factor to reduce movement speed in the air
+    public Vector3 startPosition;
 
     private Rigidbody rb;
     private bool isGrounded;
@@ -44,6 +45,11 @@ public class PlayerMovement : MonoBehaviour
         if (other.gameObject.CompareTag("Ground")) // Ensure your ground has the tag "Ground"
         {
             isGrounded = true;
+        }
+        if (other.gameObject.CompareTag("Trap"))
+        {
+            // Teleport the player to the start position
+            transform.position = startPosition;
         }
     }
 }
