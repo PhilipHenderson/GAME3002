@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerScript: MonoBehaviour
@@ -6,6 +7,9 @@ public class PlayerScript: MonoBehaviour
     public float jumpForce = 10f;
     public float airControlFactor = 0.5f; // Factor to reduce movement speed in the air
     public Vector3 startPosition;
+    public int keysCollected = 0;
+
+    public static event Action<int> OnKeysCollectedChanged; // Define an event for key collection changes
 
     private Rigidbody rb;
     private bool isGrounded;
@@ -40,6 +44,11 @@ public class PlayerScript: MonoBehaviour
         isGrounded = false;
     }
 
+    public void CollectKey()
+    {
+        keysCollected++;
+    }
+
     private void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.CompareTag("Ground")) // Ensure your ground has the tag "Ground"
@@ -50,6 +59,11 @@ public class PlayerScript: MonoBehaviour
         {
             // Teleport the player to the start position
             transform.position = startPosition;
+        }
+        if (other.gameObject.CompareTag("Key"))
+        {
+            CollectKey();
+            Destroy(other.gameObject);
         }
     }
 }
