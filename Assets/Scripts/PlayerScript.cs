@@ -1,18 +1,30 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class PlayerScript: MonoBehaviour
 {
+    [Header("Starter Properties")]
+    public Vector3 startPosition;
+
+    [Header("Movement Properties")]
     public float moveSpeed = 5f;
     public float jumpForce = 10f;
-    public float airControlFactor = 0.5f; // Factor to reduce movement speed in the air
-    public Vector3 startPosition;
-    public int keysCollected = 0;
+    public float airControlFactor = 0.5f;
+    private bool isGrounded;
 
-    public static event Action<int> OnKeysCollectedChanged; // Define an event for key collection changes
+    [Header("SpeedZone Properties")]
+    public int velocityMultiplier;
+    public int velocityMultipliyerDuration;
+    public bool SpedUp;
+    public bool SlowedDown;
+
+
+    [Header("Key Collection")]
+    public int keysCollected = 0;
+    public static event Action<int> OnKeysCollectedChanged; 
 
     private Rigidbody rb;
-    private bool isGrounded;
 
     private void Start()
     {
@@ -32,7 +44,7 @@ public class PlayerScript: MonoBehaviour
     private void MovePlayer()
     {
         float moveHorizontal = Input.GetAxis("Horizontal");
-        float controlFactor = isGrounded ? 1f : airControlFactor; // Full control on ground, reduced in air
+        float controlFactor = isGrounded ? 1f : airControlFactor;
         Vector3 movement = new Vector3(moveHorizontal * moveSpeed * controlFactor, rb.velocity.y, 0.0f);
 
         rb.velocity = movement;
@@ -51,13 +63,12 @@ public class PlayerScript: MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        if (other.gameObject.CompareTag("Ground")) // Ensure your ground has the tag "Ground"
+        if (other.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
         }
         if (other.gameObject.CompareTag("Trap"))
         {
-            // Teleport the player to the start position
             transform.position = startPosition;
         }
         if (other.gameObject.CompareTag("Key"))
@@ -65,5 +76,37 @@ public class PlayerScript: MonoBehaviour
             CollectKey();
             Destroy(other.gameObject);
         }
+        if (other.gameObject.CompareTag("SpeedZone"))
+        {
+            StartCoroutine(ApplySpeedBoost());
+        }
+        if (other.gameObject.CompareTag("SlowZone"))
+        {
+            StartCoroutine(ApplySlowBoost());
+        }
+    }
+
+    private IEnumerator ApplySpeedBoost()
+    {
+        float originalSpeed = moveSpeed;
+        moveSpeed *= velocityMultiplier; 
+        SpedUp = true;
+
+        yield return new WaitForSeconds(velocityMultipliyerDuration);
+
+        moveSpeed = originalSpeed;
+        SpedUp = false;
+    }
+
+    private IEnumerator ApplySlowBoost()
+    {
+        float originalSpeed = moveSpeed;
+        moveSpeed /= velocityMultiplier;
+        SpedUp = true;
+
+        yield return new WaitForSeconds(velocityMultipliyerDuration);
+
+        moveSpeed = originalSpeed;
+        SpedUp = false;
     }
 }
