@@ -6,6 +6,8 @@ public class PlayerScript: MonoBehaviour
 {
     [Header("Starter Properties")]
     public Vector3 startPosition;
+    public Vector3 CheckPoint1Position;
+    public Vector3 CheckPoint2Position;
 
     [Header("Movement Properties")]
     public float moveSpeed = 5f;
@@ -19,10 +21,11 @@ public class PlayerScript: MonoBehaviour
     public bool SpedUp;
     public bool SlowedDown;
 
-
     [Header("Key Collection")]
     public int keysCollected = 0;
-    public static event Action<int> OnKeysCollectedChanged; 
+
+    [Header("UI Properties")]
+    public GameObject pauseMenu;
 
     private Rigidbody rb;
 
@@ -38,6 +41,11 @@ public class PlayerScript: MonoBehaviour
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
             Jump();
+        }
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            TogglePause();
         }
     }
 
@@ -61,6 +69,20 @@ public class PlayerScript: MonoBehaviour
         keysCollected++;
     }
 
+    private void TogglePause()
+    {
+        if (Time.timeScale == 1)
+        {
+            Time.timeScale = 0; 
+            pauseMenu.SetActive(true); 
+        }
+        else
+        {
+            Time.timeScale = 1; 
+            pauseMenu.SetActive(false);
+        }
+    }
+
     private void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.CompareTag("Ground"))
@@ -70,6 +92,14 @@ public class PlayerScript: MonoBehaviour
         if (other.gameObject.CompareTag("Trap"))
         {
             transform.position = startPosition;
+        }
+        if (other.gameObject.CompareTag("Trap2"))
+        {
+            transform.position = CheckPoint1Position;
+        }
+        if (other.gameObject.CompareTag("Trap3"))
+        {
+            transform.position = CheckPoint2Position;
         }
         if (other.gameObject.CompareTag("Key"))
         {

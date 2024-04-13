@@ -9,6 +9,8 @@ TagManager:
   - Key
   - SpeedZone
   - SlowZone
+  - Trap2
+  - Trap3
   layers:
   - Default
   - TransparentFX

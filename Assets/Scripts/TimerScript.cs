@@ -5,9 +5,11 @@ using TMPro;
 public class TimerScript : MonoBehaviour
 {
     public TextMeshProUGUI timerText; // Assign in the inspector, a TMP Text to display the timer
+    public GameObject loseScreenUI; // Assign the lose screen UI GameObject in the inspector
+
     private TimeSpan timeRemaining;
     private bool timerRunning = false;
-    private float totalTime = 120f; // 2 minutes in seconds
+    private float totalTime = 120.0f; // 2 minutes in seconds
 
     private void Start()
     {
@@ -22,11 +24,15 @@ public class TimerScript : MonoBehaviour
             totalTime -= Time.deltaTime;
             if (totalTime <= 0)
             {
-                timerRunning = false;
                 totalTime = 0;
+                SetTimer(totalTime); // Ensure timer shows 00:00
+                timerRunning = false;
                 OnTimerEnd();
             }
-            SetTimer(totalTime);
+            else
+            {
+                SetTimer(totalTime);
+            }
         }
     }
 
@@ -48,7 +54,10 @@ public class TimerScript : MonoBehaviour
 
     private void OnTimerEnd()
     {
-        // Timer has ended, do something here
         Debug.Log("Timer has ended!");
+        // Activate the lose screen UI
+        loseScreenUI.SetActive(true);
+        // Pause the game
+        Time.timeScale = 0;
     }
 }
